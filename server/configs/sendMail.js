@@ -1,0 +1,81 @@
+const nodemailer = require('nodemailer')
+const dotenv = require('dotenv')
+dotenv.config()
+
+function createTransport() {
+    return nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: "testerjain3575@gmail.com",
+          pass: process.env.EMAIL_APP_PASSWORD
+        }
+    })
+}
+
+let transporter = createTransport();
+
+function sendMail(userEmail, otp) {
+    let mailOptions = {
+        from: "testerjain3575@gmail.com",
+        to: userEmail,
+        subject: 'Inventify Project',
+        html: `<div>
+                Hello From Inventify !
+                <h1>Your OTP is ${otp}</h1>
+            </div>`,
+    }
+    
+    transporter.sendMail(mailOptions, function(err, data) {
+        if (err) {
+            console.log("Error " + err);
+        } else {
+            console.log("Email sent successfully");
+        }
+    })
+}
+
+function alertManager(reorder) {
+    let tableContent = `<table style="border-collapse: collapse;">`;
+    reorder.forEach(product => {
+        tableContent += `<tr><td style="border: 2px solid #000; padding: 8px;">${product}</td></tr>`
+    });
+    tableContent += `</table>`;
+    console.log(tableContent);
+    let mailOptions = {
+        from: "testerjain3575@gmail.com",
+        to: "inventify.org@gmail.com",
+        subject: 'Reorder Products!',
+        html: tableContent,
+    }
+    
+    transporter.sendMail(mailOptions, function(err, data) {
+        if (err) {
+            console.log("Error " + err);
+        } else {
+            console.log("Manager Notified!");
+        }
+    })
+}
+
+// sendMail()
+
+function notifyRetailer(email, invoiceID) {
+    let mailOptions = {
+        from: "testerjain3575@gmail.com",
+        to: email,
+        subject: 'Order placed successfully',
+        html: `<div>
+                <p>Your order has been placed successfully!</p>
+                <p>Invoide ID ${invoiceID}</p>
+            </div>`,
+    }
+    
+    transporter.sendMail(mailOptions, function(err, data) {
+        if (err) {
+            console.log("Error " + err);
+        } else {
+            console.log("Email sent successfully");
+        }
+    })
+}
+module.exports = { sendMail, alertManager, notifyRetailer };
